@@ -70,8 +70,7 @@ export PIP_DOWNLOAD_CACHE BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
 indent() {
   RE="s/^/       /"
   [ $(uname) == "Darwin" ] && sed -l "$RE" || sed -u "$RE"
-}
-
+} 
 # Virtualenv wrapper.
 function virtualenv (){
   python "$ROOT_DIR/vendor/virtualenv-1.7.2/virtualenv.py" "$@"
@@ -227,6 +226,19 @@ OUT=$(virtualenv --python $PYTHON_EXE  --relocatable $VIRTUALENV_LOC)
 }
 set -e
 
+# Vendor application-specific lame, geos
+MAPKIN_VENDOR="$1/.mapkin/vendor"
+mkdir -p $MAPKIN_VENDOR
+
+puts-step "Installing Mapkin vendored binaries"
+echo "LAME 3.99.5" | indent
+LAME_BINARY="https://s3.amazonaws.com/warehouse.mapkin.co/heroku/lame-3.99.5.tgz"
+curl -s $LAME_BINARY -o - | tar -xz -C $MAPKIN_VENDOR -f -
+
+echo "GEOS 3.3.6" | indent
+GEOS_BINARY="https://s3.amazonaws.com/warehouse.mapkin.co/heroku/geos-3.3.6.tgz"
+curl -s $GEOS_BINARY -o - | tar -xz -C $MAPKIN_VENDOR -f -
+
 # ### Finalize
 #
 
@@ -238,10 +250,10 @@ done
 
 # Set context environment variables.
 
-set-env PATH '$HOME/.heroku/venv/bin:$PATH'
+set-env PATH '$HOME/.heroku/venv/bin:/app/.mapkin/vendor/bin:$PATH'
 set-default-env PYTHONUNBUFFERED true
-set-default-env LIBRARY_PATH /app/.heroku/vendor/lib
-set-default-env LD_LIBRARY_PATH /app/.heroku/vendor/lib
+set-env LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.mapkin/vendor/lib'
+set-env LD_LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.mapkin/vendor/lib'
 set-default-env LANG en_US.UTF-8
 set-default-env PYTHONHASHSEED random
 set-default-env PYTHONHOME /app/.heroku/venv/
