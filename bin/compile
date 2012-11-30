@@ -239,6 +239,11 @@ echo "GEOS 3.3.6" | indent
 GEOS_BINARY="https://s3.amazonaws.com/warehouse.mapkin.co/heroku/geos-3.3.6.tgz"
 curl -s $GEOS_BINARY -o - | tar -xz -C $MAPKIN_VENDOR -f -
 
+puts-step "Installing POI icons"
+mkdir -p $MAPKIN_VENDOR/poi-icons
+POI_ICONS="https://s3.amazonaws.com/warehouse.mapkin.co/heroku/poi-icons.tgz"
+curl -s $POI_ICONS -o - | tar -xz -C $MAPKIN_VENDOR/poi-icons -f -
+
 # ### Finalize
 #
 
